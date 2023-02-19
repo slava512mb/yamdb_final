@@ -145,8 +145,7 @@ dmypy.json
 
 .mypy_cache
 
-# папки со статикой и медиа
-static/
-posts/static/
-media/
 
+api_yamdb/static/data/
+api_yamdb/sent_emails/
+infra/nginx/default.conf

@@ -1,80 +1,57 @@
 from django.contrib import admin
 
-from .models import Category, Comment, Genre, Review, Title, User
+from .models import Category, Comment, Genre, GenreTitle, Review, Title
 
 
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = (
-        'name',
-        'slug',
-    )
-    search_fields = ('name',)
-    list_filter = ('name',)
-    empty_value_display = '-пусто-'
-
-
-@admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
-    list_display = (
-        'review',
-        'text',
-        'author',
-        'pub_date',
-    )
-    search_fields = ('review',)
-    list_filter = ('review',)
-    empty_value_display = '-пусто-'
-
-
-@admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
     list_display = (
+        'pk',
         'name',
-        'slug',
+        'slug'
     )
-    search_fields = ('name',)
-    list_filter = ('name',)
+    list_editable = ('name', 'slug',)
+    search_fields = ('name', 'slug')
     empty_value_display = '-пусто-'
 
 
-@admin.register(Review)
-class ReviewAdmin(admin.ModelAdmin):
-    list_display = (
-        'title',
-        'text',
-        'author',
-        'score',
-    )
-    search_fields = ('pub_date',)
-    list_filter = ('pub_date',)
-    empty_value_display = '-пусто-'
-
-
-@admin.register(Title)
 class TitleAdmin(admin.ModelAdmin):
     list_display = (
+        'pk',
         'name',
         'year',
         'category',
-        'description',
+        'get_genre'
     )
-    search_fields = ('name',)
-    list_filter = ('name',)
+    list_editable = ('name', 'year', 'category')
+    search_fields = ('name', 'year', 'category')
     empty_value_display = '-пусто-'
 
 
-@admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class CategoryAdmin(admin.ModelAdmin):
     list_display = (
-        'username',
-        'email',
-        'role',
-        'bio',
-        'first_name',
-        'last_name',
-        'confirmation_code',
+        'pk',
+        'name',
+        'slug'
     )
-    search_fields = ('username', 'role',)
-    list_filter = ('username',)
+    list_editable = ('name', 'slug',)
+    search_fields = ('name', 'slug')
     empty_value_display = '-пусто-'
+
+
+class GenreTitleAdmin(admin.ModelAdmin):
+    list_display = (
+        'pk',
+        'title',
+        'genre'
+    )
+    list_editable = ('title', 'genre')
+    search_fields = ('title', 'genre')
+    empty_value_display = '-пусто-'
+
+
+admin.site.register(GenreTitle, GenreTitleAdmin)
+admin.site.register(Title, TitleAdmin)
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Genre, GenreAdmin)
+admin.site.register(Comment)
+admin.site.register(Review)

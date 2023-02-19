@@ -2,17 +2,9 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 
-def validate_username(value):
-    if value == 'me':
+def title_year_validator(value):
+    if value < 1900 or value > timezone.now().year:
         raise ValidationError(
-            ('Имя пользователя не может быть <me>.'),
+            ('%(value)s - слишком давно это было, давай что то посвежее'),
             params={'value': value},
-        )
-
-
-def validate_year(value):
-    now = timezone.now().year
-    if value > now:
-        raise ValidationError(
-            f'{value} не может быть больше {now}'
         )

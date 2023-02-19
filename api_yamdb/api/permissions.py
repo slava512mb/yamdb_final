@@ -1,40 +1,44 @@
-from rest_framework import permissions
+from rest_framework import permissions, status
 
 
-class AdminOnly(permissions.BasePermission):
+class IsAdminOrReadOnly(permissions.BasePermission):
+
     def has_permission(self, request, view):
-        return (
-            request.user.is_admin
-            or request.user.is_staff
-        )
-
-    def has_object_permission(self, request, view, obj):
-        return (
-            request.user.is_admin
-            or request.user.is_staff
-        )
-
-
-class IsAdminUserOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True
+        safe = request.method in permissions.SAFE_METHODS
         if request.user.is_authenticated:
-            return request.user.is_admin
+            return safe or request.user._is_admin
+        return safe
+
+
+class ReadOnly(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.method == "GET"
+
+
+class AdminOrSuperuser(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.user.is_authenticated:
+            return request.user._is_admin
         return False
 
 
-class AdminModeratorAuthorPermission(permissions.BasePermission):
+class IsUserAnonModerAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or request.user.is_authenticated
-        )
+        return (request.method in permissions.SAFE_METHODS
+                or request.user.is_authenticated)
 
     def has_object_permission(self, request, view, obj):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or obj.author == request.user
-            or request.user.is_moderator
-            or request.user.is_admin
-        )
+        if request.method == "DELETE":
+            if request.user == obj.author:
+                return (True, status.HTTP_403_FORBIDDEN)
+            if request.user._is_moderator:
+                return (True, status.HTTP_204_NO_CONTENT)
+
+        safe = request.method in permissions.SAFE_METHODS
+        if request.user.is_authenticated:
+            admin_or_author = (
+                request.user._is_admin
+                or request.user == obj.author
+            )
+            return safe or admin_or_author
+        return safe
