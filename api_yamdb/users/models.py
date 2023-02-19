@@ -1,65 +1,56 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import UniqueConstraint
+from django.utils.translation import gettext_lazy as _
+
+
+def validate_not_me(value):
+    if value == 'me':
+        raise ValidationError('Нельзя использовать "me" как имя пользователя.')
 
 
 class User(AbstractUser):
     USER = 'user'
-    MODERATOR = 'moderator'
     ADMIN = 'admin'
-
-    ROLES = (
+    MODERATOR = 'moderator'
+    ROLE_CHOICES = [
         (USER, 'Пользователь'),
-        (MODERATOR, 'Модератор'),
-        (ADMIN, 'Администратор'),
-    )
+        (ADMIN, 'Админ'),
+        (MODERATOR, 'Модератор')
+    ]
 
-    bio = models.TextField(
-        verbose_name='Биография',
-        blank=True,
-        null=True
+    role = models.CharField('user role',
+                            max_length=9,
+                            choices=ROLE_CHOICES,
+                            blank=False,
+                            default=USER
+                            )
+    bio = models.TextField('user bio', blank=True)
+    confirmation_code = models.CharField('email code',
+                                         blank=True, max_length=9)
+    username = models.CharField(
+        _('username'),
+        max_length=150,
+        unique=True,
+        help_text=_(
+            'Required. 150 characters, fewer. Letters, digits and @/./+/-/_.'),
+        validators=[AbstractUser.username_validator, validate_not_me],
+        error_messages={
+            'unique': _("A user with that username already exists."),
+        },
     )
-
-    role = models.CharField(
-        verbose_name='Роль',
-        max_length=50,
-        choices=ROLES,
-        default=USER
-    )
-
-    email = models.EmailField(
-        verbose_name='Электронная почта',
-        unique=True
-    )
-
-    confirmation_code = models.CharField(
-        verbose_name='Код подтверждения',
-        max_length=20,
-        null=True,
-        blank=True
-
-    )
+    email = models.EmailField(_('email address'), blank=False, unique=True)
 
     class Meta:
-        ordering = ('id',)
-        constraints = [
-            models.UniqueConstraint(
-                fields=['email', 'username'],
-                name='unique_username_and_email'
-            )
-        ]
-
-    def __str__(self):
-        return self.username
+        constraints = [UniqueConstraint(
+            fields=['username', 'email'],
+            name='unique_username_email',
+        )]
 
     @property
     def is_admin(self):
-        return any(
-            (
-                self.role == self.ADMIN,
-                self.is_superuser,
-                self.is_staff,
-            )
-        )
+        return (self.role == self.ADMIN or self.is_superuser)
 
     @property
     def is_moderator(self):
