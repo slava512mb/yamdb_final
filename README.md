@@ -1,4 +1,4 @@
-![Yamdb Workflow Status](https://github.com/slava512mb/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
+[![Django-app workflow](https://github.com/Slava512mb/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)](https://github.com/Slava512mb/yamdb_final/actions/workflows/yamdb_workflow.yml)
 # ЯП - Спринт 16 - CI и CD проекта api_yamdb (Яндекс.Практикум)
 
 
@@ -12,14 +12,11 @@
 - автоматический деплой на боевой сервер при пуше в главную ветку main.
 
 Стек:
-- Django 4.1.1
+- Django 2.2
 - DRF 3.14.0
 - djangorestframework-simplejwt 5.2.1
 - psycopg2-binary 2.9.3
 - PyJWT 2.5.0
-
-### Как запустить проект:
-Все описанное ниже относится к ОС Linux.
 
 ### Клонируем репозиторий и и переходим в него:
 
