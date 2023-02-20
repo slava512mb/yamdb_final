@@ -41,7 +41,7 @@ docker compose up -d && sleep 2 && docker compose exec web python manage.py migr
 ```
 http://127.0.0.1/api/v1/
 ```
-## Проект развернут на сервере
+### Проект развернут на сервере
 ```
 http://158.160.20.82/redoc/
 ```
