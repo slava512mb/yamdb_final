@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.8'
 
 services:
   db:
@@ -6,7 +6,7 @@ services:
     volumes:
       - postgresql_value:/var/lib/postgresql/data/
     env_file:
-      - .env
+      - ./.env
 
   web:
     image: slava512mb/infra_yp
@@ -17,7 +17,7 @@ services:
     depends_on:
       - db
     env_file:
-      - .env
+      - ./.env
 
   nginx:
     image: nginx:1.21.3-alpine
