@@ -1,5 +1,5 @@
 # yamdb_final
-![Django workflow](https://github.com/slava512mb/yamdb_final/actions/workflows/main.yml/badge.svg)
+![Django workflow](https://github.com/slava512mb/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
 # YaMDb api
 
 ## Самая актуальная версия API всемирно известного YaMDb.
@@ -43,7 +43,7 @@ http://127.0.0.1/api/v1/
 ```
 ### Проект развернут на сервере
 ```
-http://10.129.0.27/redoc/
+http://158.160.2.107/
 ```
 ## Пользовательские роли
 ```Аноним — может просматривать описания произведений, читать отзывы и комментарии.```
