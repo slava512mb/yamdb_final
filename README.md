@@ -1,223 +1,264 @@
-# yamdb_final
-![Django workflow](https://github.com/slava512mb/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
-# YaMDb api
+![Yamdb Workflow Status](https://github.com/slava512mb/yamdb_final/actions/workflows/yamdb_workflow.yml/badge.svg)
+# ЯП - Спринт 16 - CI и CD проекта api_yamdb (Яндекс.Практикум)
 
-## Самая актуальная версия API всемирно известного YaMDb.
 
-YaTube API это RESTful API, позволяющий создавать и редактировать отзывы на различные произведения, оценивать их и
-оставлять комментарии к отзывам. В основе проекта лежат Django и Django REST Framework.
+Проект развернут по адресу: http://158.160.2.107:8000/redoc/
+## Описание 
+ 
+Проект YaMDb собирает отзывы пользователей на произведения. Произведения делятся на категории:«Книги», «Фильмы», «Музыка».
+Настроика для приложения Continuous Integration и Continuous Deployment, реализация:
+- автоматический запуск тестов,
+- обновление образов на Docker Hub,
+- автоматический деплой на боевой сервер при пуше в главную ветку main.
 
-## Особенности
-
-- Пишите свои ревью и ставьте оценки произведениям.
-- Авторизация происходит по токену. 
-- Токен можно получить введя код подтверждения из электронного письма.
-- При просмотре информации о каком-либо произведении будет выведена его средняя оценка.
-- Для авторизованных пользователей присутствует возможность комментировать отзывы.
-
-## Технологии
-
-- [Django]
-- [Django REST Framework]
-
-## Начало работы
-```
-git clone
-cd yamdb_final/infra
-```
-```
-docker compose up -d
-docker compose exec web python manage.py migrate
-docker compose exec web python manage.py collectstatic
-docker compose exec web python manage.py loaddata fixtures.json
-```
-ИЛИ одной строчкой!
-```
-docker compose up -d && sleep 2 && docker compose exec web python manage.py migrate && docker compose exec web python manage.py collectstatic && docker compose exec web python manage.py loaddata fixtures.json
-```
+Стек:
+- Django 4.1.1
+- DRF 3.14.0
+- djangorestframework-simplejwt 5.2.1
+- psycopg2-binary 2.9.3
+- PyJWT 2.5.0
 
 ### Как запустить проект:
+Все описанное ниже относится к ОС Linux.
 
+### Клонируем репозиторий и и переходим в него:
+
+```bash
+git clone https://github.com/slava512mb/yamdb_final.git
 ```
-http://127.0.0.1/api/v1/
-```
-### Проект развернут на сервере
-```
-http://158.160.2.107/api/v1/
-```
-## Пользовательские роли
-```Аноним — может просматривать описания произведений, читать отзывы и комментарии.```
-
-```Аутентифицированный пользователь (user) — может, как и Аноним, читать всё, дополнительно он может публиковать отзывы и ставить оценку произведениям (фильмам/книгам/песенкам), может комментировать чужие отзывы;может редактировать и удалять свои отзывы и комментарии. Эта роль присваивается по умолчанию каждому новому пользователю.```
-
-```Модератор (moderator) — те же права, что и у Аутентифицированного пользователя плюс право удалять любые отзывы и комментарии.```
-
-```Администратор (admin) — полные права на управление всем контентом проекта. Может создавать и удалять произведения, категории и жанры. Может назначать роли пользователям.```
-
-```Суперюзер Django — обладет правами администратора (admin)```
-
-## Примеры работы с API:
-
-Получение списка всех категорий и создание новой(доступно только для роли 'Administrator') происходит на эндпоинте:
-
-```
-http://127.0.0.1/api/v1/categories/
+```bash
+cd yamdb_final
 ```
 
-Пример ответа при GET запросе с параметрами offset и count:
+### Создаем и активируем виртуальное окружение:
+```bash
+python3 -m venv venv
 ```
-[
-  {
-    "count": 0,
-    "next": "string",
-    "previous": "string",
-    "results": [
-      {
-        "name": "string",
-        "slug": "string"
-      }
-    ]
-  }
-]
-
+- Windows:
+```bash
+source venv/Scripts/activate
 ```
-
-Редактирование категорий запрещено. Удаление категории происходит на эндпоинте:
-
-```sh
-http://127.0.0.1/api/v1/categories/{slug}/
+- Linux:
+```bash
+source venv/bin/activate
+```
+### Обновим pip:
+```bash
+python -m pip install --upgrade pip 
 ```
 
-
-Получение списка жанров и создание нового(доступно только для роли 'Administrator') происходит на эндпоинте:
-
-```sh
-http://127.0.0.1/api/v1/genres/
-```
-Пример ответа:
-```
-[
-  {
-    "count": 0,
-    "next": "string",
-    "previous": "string",
-    "results": [
-      {
-        "name": "string",
-        "slug": "string"
-      }
-    ]
-  }
-]
+### Ставим зависимости из requirements.txt:
+```bash
+pip install -r api_yamdb/requirements.txt 
 ```
 
-Получение конкретного жанра, а так же его редактирование запрещено. А удаление происходит на эндпоинте:
-
-```sh
-http://127.0.0.1/api/v1/genres/{slug}/
+### Переходим в папку с файлом docker-compose.yaml:
+```bash
+cd infra
 ```
 
-Получение списка произведений и создание нового происходит на эндпоинте:
-
-```sh
-http://127.0.0.1/api/v1/titles/
+### Предварительно установим Docker на ПК:
+```bash
+sudo apt update && apt upgrade -y
+```
+### Удаляем старый Docker:
+```bash
+sudo apt remove docker
 ```
 
-Пример ответа:
+### Устанавливаем Docker:
+```bash
+sudo apt install docker.io
 ```
-[
-  {
-    "id": 0,
-    "title": "string",
-    "slug": "string",
-    "description": "string"
-  }
-]
+### Смотрим версию Docker (должно выдать Docker version 20.10.16, build 20.10.16-0ubuntu1):
+```bash
+docker --version
+```
+### Активируем Docker в системе, что бы при перезагрузке запускался автоматом:
+```bash
+sudo systemctl enable docker
+```
+### Запускаем Docker:
+```bash
+sudo systemctl start docker
+```
+### Смотрим статус:
+```bash
+sudo systemctl status docker
+```
+### Не будет лишнем установить PostgreSQL:
+```bash
+sudo apt install postgresql postgresql-contrib -y
 ```
 
-Для конкретной группы доступен только метод GET(id - первичный ключ таблицы Groups) на эндпоинте:
-
-```sh
-http://127.0.0.1/api/v1/groups/{id}/
+### Предварительно в папке infra создаем файл .env с следующим содержимом:
+```bash
+DB_ENGINE=название бд
+DB_NAME=имя базы данных
+POSTGRES_USER=логин для подключения к базе данных
+POSTGRES_PASSWORD=пароль для подключения к БД установите свой
+DB_HOST=название контейнера
+DB_PORT=порт для подключения к БД
+DB_PORT=порт для подключения к БД
+SECRET_KEY=секретный ключ проекта django
 ```
 
-Пример ответа:
+### Так как требование ТЗ и тестов использовать postgresql, то создадим в системе бд:
+```bash
+sudo dpkg-reconfigure locales 
 ```
-{
-  "id": 0,
-  "title": "string",
-  "slug": "string",
-  "description": "string"
+### Выбираем ru_RU.UTF-8 нажав пробел и ждем сообщения Generation complete.
+```
+Generating locales (this might take a while)...
+...
+  ru_RU.UTF-8... done
+...
+Generation complete.
+```
+### Перезапустим систему:
+```bash
+sudo reboot
+```
+### Установка PostgreSQL:
+```bash
+sudo apt install postgresql postgresql-contrib -y
+```
+### Управляем БД:
+- Остановить
+```bash
+sudo systemctl stop postgresql
+```
+- Запустить
+```bash
+sudo systemctl start postgresql
+```
+- Перезапустить
+```bash
+sudo systemctl restart postgresql
+```
+- Узнать статус, текущее состояние
+```bash
+sudo systemctl status postgresql
+```
+### Создаем бд и пользователя:
+```bash
+sudo -u postgres psql
+```
+### Создаем базу:
+```sql
+CREATE DATABASE test_base;
+```
+### Создаем пользователя:
+```sql
+CREATE USER test_user WITH ENCRYPTED PASSWORD 'test_pass';
+```
+### Даем права для пользователя:
+```sql
+GRANT ALL PRIVILEGES ON DATABASE test_base TO test_user;
+```
+### Не забываем про установку, что мы сделали ранее, активировав venv:
+```bash
+pip install psycopg2-binary
+```
+```bash
+pip install python-dotenv
+```
+### В settings.py добавляем следующее:
+```python
+from dotenv import load_dotenv
+
+load_dotenv()
+
+...
+
+DATABASES = {
+    'default': {
+        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME', default='postgres'),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': os.getenv('DB_HOST', default='db'),
+        'PORT': os.getenv('DB_PORT', default='5432')
+    }
 }
 ```
-
-Следующий эндпоинт возвращает все подписки пользователя, сделавшего запрос. Анонимные запросы запрещены (метод GET):
-
-```sh
-http://127.0.0.1/api/v1/follow/
+### Переходим в папку где находится файл settings.py. Создаем файл .env:
+```bash
+touch .env
+```
+```bash
+nano .env
+```
+### Наполнение .env файла:
+```bash
+DB_ENGINE=название бд
+DB_NAME=имя базы данных
+POSTGRES_USER=логин для подключения к базе данных
+POSTGRES_PASSWORD=пароль для подключения к БД установите свой
+DB_HOST=название контейнера
+DB_PORT=порт для подключения к БД
+DB_PORT=порт для подключения к БД
+SECRET_KEY=секретный ключ проекта django
 ```
 
-Пример ответа:
+### Не забываем про миграции (виртуальное окружение активировано):
+```bash
+python manage.py migrate
 ```
-[
-  {
-    "user": "string",
-    "following": "string"
-  }
-]
-```
-
-Подписка пользователя от имени которого сделан запрос на пользователя переданного в теле запроса. Анонимные запросы
-запрещены (метод POST):
-
-```sh
-http://127.0.0.1/api/v1/follow/
+### Поднимаем контейнеры
+    infra_db - база,
+    infra_web - веб,
+    nfra_nginx - nginx сервер
+    может пригодится команда sudo systemctl stop nginx если запускаете в DEV режиме на ПК:
+```bash
+sudo docker-compose up -d --build 
 ```
 
-Создание, обновление и верификация токена происходит на следущих эндпоинтах:
-
-```sh
-http://127.0.0.1/api/v1/titles/{title_id}/reviews/{review_id}/comments/
+### Выполняем миграции в контейнере infra_web:
+```bash
+sudo docker-compose exec web python manage.py makemigrations reviews 
+```
+```bash
+sudo docker-compose exec web python manage.py migrate --run-syncdb
+```
+### Создаем суперпользователя:
+```bash
+docker-compose exec web python manage.py createsuperuser 
 ```
 
-Пример ответа:
-```
-[
-  {
-    "count": 0,
-    "next": "string",
-    "previous": "string",
-    "results": [
-      {
-        "id": 0,
-        "text": "string",
-        "author": "string",
-        "pub_date": "2019-08-24T14:15:22Z"
-      }
-    ]
-  }
-]
+### Собираем статику:
+```bash
+docker-compose exec web python manage.py collectstatic --no-input 
 ```
 
-Получение конкретного комментария, а так же его редактирование и удаление
-(доступно только для автора комментария, модератора или администратора) происходит на эндпоинте:
-
-```sh
-http://127.0.0.1/api/v1/titles/{title_id}/reviews/{review_id}/comments/{comment_id}/
-```
-Пример ответа: 
-```
-{
-  "id": 0,
-  "text": "string",
-  "author": "string",
-  "pub_date": "2019-08-24T14:15:22Z"
-}
+### Создаем дамп базы данных (нет в текущем репозитории):
+```bash
+docker-compose exec web python manage.py dumpdata > dumpPostrgeSQL.json 
 ```
 
-Регистрация пользователя и получение jwt токена происходит на следующих эндпоинтах:
-
-```sh
-http://127.0.0.1/api/v1/auth/signup/
-http://127.0.0.1/api/v1/auth/token/
+### Для заполнения базы тестовыми данными воспользуемся файлом fixtures.json, который находится в infra_sp2:
+```bash
+docker-compose exec web python manage.py loaddata fixtures.json
 ```
+
+### Останавливаем контейнеры:
+```bash
+docker-compose down -v 
+```
+
+### Шаблон наполнения .env (не включен в текущий репозиторий) расположенный по пути infra/.env
+```bash
+DB_ENGINE=название бд
+DB_NAME=имя базы данных
+POSTGRES_USER=логин для подключения к базе данных
+POSTGRES_PASSWORD=пароль для подключения к БД установите свой
+DB_HOST=название контейнера
+DB_PORT=порт для подключения к БД
+DB_PORT=порт для подключения к БД
+SECRET_KEY=секретный ключ проекта django
+```
+
+### Документация API YaMDb 
+Документация доступна по эндпойнту: http://158.160.2.107:8000/redoc/
+
+### Выполнил: [Вячеслав Поликарский](https://github.com/slava512mb)
