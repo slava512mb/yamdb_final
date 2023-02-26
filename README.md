@@ -70,7 +70,7 @@ sudo apt remove docker
 ```bash
 sudo apt install docker.io
 ```
-### Смотрим версию Docker (должно выдать Docker version 20.10.16, build 20.10.16-0ubuntu1):
+### Смотрим версию Docker (должно выдать Docker version 20.10.1612, build 20.10.12-0ubuntu4):
 ```bash
 docker --version
 ```

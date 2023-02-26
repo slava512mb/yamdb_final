@@ -9,7 +9,7 @@ services:
       - ./.env
 
   web:
-    image: slava512mb/infra_yp
+    image: slava512mb/infra_yp:latest
     restart: always
     volumes:
       - static_value:/app/static/
